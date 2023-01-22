@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import MeetupList from "../components/meetups/MeetupList";
 
@@ -6,16 +6,29 @@ function AllMeetupsPage() {
     const [isLoading, setIsLoaging] = useState(true);
     const [LoadedMeetups, setLoadedMeetups] = useState([]);
 
-    fetch(
-        "https://react-getting-started-174ef-default-rtdb.firebaseio.com/meetups.json"
-    )
-        .then((response) => {
-            return response.json();
-        })
-        .then((data) => {
-            setIsLoaging(false);
-            setLoadedMeetups(data);
-        });
+    useEffect(() => {
+        setIsLoaging(true);
+        fetch(
+            "https://react-getting-started-174ef-default-rtdb.firebaseio.com/meetups.json"
+        )
+            .then((response) => {
+                return response.json();
+            })
+            .then((data) => {
+                const meetups = [];
+                for (const key in data) {
+                    const meetup = {
+                        id: key,
+                        ...data[key],
+                    };
+
+                    meetups.push(meetup);
+                }
+
+                setIsLoaging(false);
+                setLoadedMeetups(meetups);
+            });
+    }, []);
 
     if (isLoading) {
         return (
